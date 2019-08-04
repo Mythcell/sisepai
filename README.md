@@ -10,7 +10,8 @@ Unfortunately, as if often the case with games passed down orally, the rules of 
 have effectively led to a family of Sisepai-style games rather than a single standard.  For example, the [Wikipedia article](https://en.wikipedia.org/wiki/Four_Color_Cards)
 on the topic appears to describe the 26-card game, while [this](https://www.cs.cmu.edu/~tnt/rules.html) site describes the 21-card game
 with different terminology.  In both this implementation and the attached PDF guide, the names of the cards are how they are pronounced in
-Hakka Chinese (the language my family speak).
+Hakka Chinese (the language my family speak), and the terminology is a mix of terms that I have coined as well as conventions
+used by my family.
 
 ### The Code
 
