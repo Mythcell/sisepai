@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 This file contains the key functions and game logic needed to simulate
 a complete n-player game of Sisepai.

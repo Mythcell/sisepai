@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 This file contains the classes for all the core game objects in Sisepai,
 along with several general functions for hand evaluations, etc.
