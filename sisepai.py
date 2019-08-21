@@ -46,10 +46,10 @@ class Deck():
     def populate_deck(self, ndecks=2):
         """Creates a list of [ndeck] decks of sisepai cards"""
         cards=[]; c=Card()
-        for i in c.validSuits:
-            for j in c.validColours:
+        for i in c.validColours:
+            for j in c.validSuits:
                 for k in range(4*ndecks):
-                    cards.append(Card(j,i))
+                    cards.append(Card(i,j))
         del c; return cards
 
     def draw_active_card(self, shuffle=False):
@@ -432,6 +432,14 @@ def exists_nks(hand_sets):
     for s in hand_sets:
         if len(s.cards) > 1: return True
     return False
+
+def get_sisepai_cards(activate=False):
+    """Returns a list of all 28 unique Sisepai cards (active cards optional)"""
+    cards=[]; c = Card()
+    for i in c.validColours:
+        for j in c.validSuits:
+            cards.append(Card(i,j,active=activate))
+    return cards
 
 def evaluate_hand(hand_cards, return_sets=False):
     """Determines the combined score of all sets from the given list of cards.

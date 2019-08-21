@@ -10,18 +10,6 @@ import sisepai as ssp
 import numpy as np
 import math
 
-#Core variables
-players=[]
-discards=[] #the global discard pile consisting of all the players' discards
-faceup_sets=[] #a list of each players' face-up melded sets
-active_card=None
-deck=None
-current_player=0
-enable_oot=True
-
-#Stat variables
-turn_count=0
-
 def construct_deck(nplayers):
     """Constructs an appropriately sized deck given the number of players"""
     global deck
@@ -32,7 +20,7 @@ def construct_deck(nplayers):
     else:
         deck=ssp.Deck(ndecks=math.floor((nplayers+1)/2))
 
-def setup_game(nplayers):
+def setup_game(nplayers=4,agents=[]):
     """Populates the player array, builds the overall deck and deals cards to all players"""
     global players; global current_player; global active_card
     global discards; global faceup_sets; global turn_count
@@ -41,12 +29,15 @@ def setup_game(nplayers):
     active_card=None; turn_count=0
 
     #Initialise key arrays
-    players=[ssp.Player(name='Player '+str(i)) for i in range(nplayers)]
-    discards=[]; faceup_sets=[]
+    players=[]; discards=[]; faceup_sets=[]
 
-    construct_deck(nplayers)
+    #Setup the player array with either the supplied list of agents or nplayers default agents
+    if len(agents) > 0: players=[a for a in agents]
+    else: players=[ssp.Player(name='Player '+str(i)) for i in range(nplayers)]
+
+    construct_deck(len(players))
     #Randomly choose the player to start first
-    fp = np.random.choice(range(nplayers),1)[0]
+    fp = np.random.choice(range(len(players)),1)[0]
     current_player=fp
 
     #Deal cards to all players
@@ -54,7 +45,7 @@ def setup_game(nplayers):
     #Deal an extra card to the player to start first
     players[fp].give_cards(deck.draw_cards(1))
 
-    print('Player',fp,'starts')
+    if verbose: print('Player',fp,'starts')
 
 def check_oot(drawn=False):
     """Determines if any players can meld out of turn.  If so, sets the current player index to
@@ -90,13 +81,13 @@ def check_oot(drawn=False):
     return 'meld' #default
 
 
-def conduct_turn(verbose=True,oot_turn=False):
+def conduct_turn(oot_turn=False):
     """Conducts a turn of Sisepai, updates field variables, and determines the next player to play"""
     #Get the key gameplay variables
     global deck; global players; global current_player
     global faceup_sets; global discards; global active_card
     global turn_count;
-    
+
     if verbose: print('') #start a new line for readibility
 
     #Give each player the updated field information
@@ -177,50 +168,66 @@ def conduct_turn(verbose=True,oot_turn=False):
         current_player = (current_player + 1) % len(players)
         return 'next'
 
-def play_game(nplayers,nturns=0,verbose=True,with_oot=True):
-    """Contains the key gameplay loop"""
+def play_game(nplayers=4,agents=[],nturns=0,is_verbose=True,with_oot=True):
+    """Simulates a game of Sisepai.  Uses the supplied list of agents, otherwise runs
+    the game with [nplayers] players using the default functionality.
+    If nturns is supplied with a positive value, the game is simulated for [nturns] turns.
+    Otherwise the game continues until a player wins or an exit case is reached.
+    Out-of-turn melding can be toggled; so too can verbose output."""
+
     global enable_oot
     enable_oot=with_oot if nplayers > 2 else False
+    global verbose; verbose=is_verbose
 
-    setup_game(nplayers)
+    #If a list of agents is provided then the game will be setup with those irrespective of whatever nplayers was set to
+    if len(agents) > 0:
+        if verbose: print('Setting up game with supplied list of agents')
+        setup_game(agents=agents)
+    else:
+        if verbose: print('Setting up game with',nplayers,'default agents')
+        setup_game(nplayers=nplayers)
+
     oot=False
 
     #Either play until someone wins...
     if nturns < 1:
         while True: #(MAIN GAME LOOP)
             if not enable_oot:
-                result = conduct_turn(verbose=verbose)
+                result = conduct_turn()
             elif oot:
-                result = conduct_turn(verbose=verbose,oot_turn=True)
+                result = conduct_turn(oot_turn=True)
             else:
-                result = conduct_turn(verbose=verbose)
+                result = conduct_turn()
 
             if result=='win' or result=='exit': break
 
             if result=='oot': oot=True
             else: oot=False
 
-        print('\nPlayer',current_player,'wins with a score of',players[current_player].total_score)
-        print('This game took',turn_count,'turns')
+        if verbose:
+            print('\nPlayer',current_player,'wins with a score of',players[current_player].total_score)
+            print('This game took',turn_count,'turns')
 
     #...or simulate game for nturns turns
-    else:
+    elif nturns > 0:
         for i in range(nturns):
             if not enable_oot:
-                result = conduct_turn(verbose=verbose)
+                result = conduct_turn()
             elif oot:
-                result = conduct_turn(verbose=verbose,oot_turn=True)
+                result = conduct_turn(oot_turn=True)
             else:
-                result = conduct_turn(verbose=verbose)
+                result = conduct_turn()
 
             if result=='win' or result=='exit': break
 
             if result=='oot': oot=True
             else: oot=False
 
-        print('\nPlayer',current_player,'wins with a score of',players[current_player].total_score)
-        print('This game took',turn_count,'turns')
+        if verbose:
+            print('\nPlayer',current_player,'wins with a score of',players[current_player].total_score)
+            print('This game took',turn_count,'turns')
 
+    else: print('Invalid turn argument')
 
 if __name__ == '__main__':
     play_game(8)
