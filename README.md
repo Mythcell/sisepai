@@ -13,7 +13,7 @@ Examples of possible simulations:
 - `play_game()` - default 4-player game
 - `play_game(8)` - 8-player game
 - `play_game(8,nturns=50)` - simulate an 8-player game for 50 turns
-- `play_game(8,is_verbose=False)` - disable verbose logging (helpful when simulations millions of games)
+- `play_game(8,is_verbose=False)` - disable verbose logging (helpful when simulating millions of games)
 - `play_game(8,with_oot=False)` - disable out-of-turn melding
 
 ### Rationale
