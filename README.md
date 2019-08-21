@@ -1,7 +1,22 @@
 # sisepai
 Python 3.X code for the Chinese card game Sisepai (Four Colour Cards) (21 card variant)
+***
+**NOTE `numpy` is required!**
 
-### Introduction
+Simply execute the code in a terminal:
+
+```$ python3 game.py```
+
+You can also run `game.py` as an executable (ensure you have sufficient permissions by first running `chmod +x game.py`)
+
+Examples of possible simulations:
+- `play_game()` - default 4-player game
+- `play_game(8)` - 8-player game
+- `play_game(8,nturns=50)` - simulate an 8-player game for 50 turns
+- `play_game(8,is_verbose=False)` - disable verbose logging (helpful when simulations millions of games)
+- `play_game(8,with_oot=False)` - disable out-of-turn melding
+
+### Rationale
 
 Sisepai is a rummy-like card game that originated in southern China.  As I am half-Chinese, and hearing how the game is in decline,
 this personal project is an attempt to record the essence of the game (as it is known to my family) in both code and a brief rulebook.
@@ -13,9 +28,9 @@ with different terminology.  In both this implementation and the attached PDF gu
 Hakka Chinese (the language my family speak), and the terminology is a mix of terms that I have coined as well as conventions
 used by my family.
 
-### The Code
+### Code Structure
 
-The code is a simple implementation of the game logic using rules-based computer agents.  `sisepai.py` contains all the necessary classes
+The code is a simple implementation of the game logic using a rules-based agent.  `sisepai.py` contains all the necessary classes
 and functions to model the game objects (Cards, Sets, Decks, Players), while `game.py` contains the core game logic.
 The files require `numpy` to run.
 
