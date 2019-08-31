@@ -20,7 +20,7 @@ def construct_deck(nplayers):
     else:
         deck=ssp.Deck(ndecks=math.floor((nplayers+1)/2))
 
-def setup_game(nplayers=4,agents=[]):
+def setup_game(agents):
     """Populates the player array, builds the overall deck and deals cards to all players"""
     global players; global current_player; global active_card
     global discards; global faceup_sets; global turn_count
@@ -29,11 +29,10 @@ def setup_game(nplayers=4,agents=[]):
     active_card=None; turn_count=0
 
     #Initialise key arrays
-    players=[]; discards=[]; faceup_sets=[]
+    discards=[]; faceup_sets=[]
 
-    #Setup the player array with either the supplied list of agents or nplayers default agents
-    if len(agents) > 0: players=[a for a in agents]
-    else: players=[ssp.Player(name='Player '+str(i)) for i in range(nplayers)]
+    #Setup the player array with either the supplied list of agents
+    players=[a for a in agents]
 
     construct_deck(len(players))
     #Randomly choose the player to start first
@@ -61,7 +60,7 @@ def check_oot(drawn=False):
     for i in range(len(players)):
         if oot_sets[cp] != None:
             if ssp.is_identical_set(oot_sets[cp]) and len(oot_sets[cp].cards)==4:
-                if cp == (current_player + 1) % len(players) and not drawn:
+                if cp == (current_player + 1) % len(players):
                     return 'meld' #continue as normal if the next player can meld
                 current_player=cp #shift priority to the first player found
                 return 'oot'
@@ -73,7 +72,7 @@ def check_oot(drawn=False):
     for i in range(len(players)):
         if oot_sets[cp] != None:
             if ssp.is_identical_set(oot_sets[cp]) and len(oot_sets[cp].cards)==3:
-                if cp == (current_player + 1) % len(players) and not drawn:
+                if cp == (current_player + 1) % len(players):
                     return 'meld' #continue as normal if the next player can meld
                 current_player=cp #shift priority to the first player found
                 return 'oot'
@@ -171,6 +170,7 @@ def conduct_turn(oot_turn=False):
 def play_game(nplayers=4,agents=[],nturns=0,is_verbose=True,with_oot=True):
     """Simulates a game of Sisepai.  Uses the supplied list of agents, otherwise runs
     the game with [nplayers] players using the default functionality.
+    If a list of agents is supplied then this overwrites [nplayers].
     If nturns is supplied with a positive value, the game is simulated for [nturns] turns.
     Otherwise the game continues until a player wins or an exit case is reached.
     Out-of-turn melding can be toggled; so too can verbose output."""
@@ -182,19 +182,17 @@ def play_game(nplayers=4,agents=[],nturns=0,is_verbose=True,with_oot=True):
     #If a list of agents is provided then the game will be setup with those irrespective of whatever nplayers was set to
     if len(agents) > 0:
         if verbose: print('Setting up game with supplied list of agents')
-        setup_game(agents=agents)
+        setup_game(agents)
     else:
+    #Otherwise setup the game with [nplayers] default agents
         if verbose: print('Setting up game with',nplayers,'default agents')
-        setup_game(nplayers=nplayers)
+        setup_game([ssp.Player(name='Player '+str(i)) for i in range(nplayers)])
 
     oot=False
-
     #Either play until someone wins...
     if nturns < 1:
         while True: #(MAIN GAME LOOP)
-            if not enable_oot:
-                result = conduct_turn()
-            elif oot:
+            if oot:
                 result = conduct_turn(oot_turn=True)
             else:
                 result = conduct_turn()
@@ -211,9 +209,7 @@ def play_game(nplayers=4,agents=[],nturns=0,is_verbose=True,with_oot=True):
     #...or simulate game for nturns turns
     elif nturns > 0:
         for i in range(nturns):
-            if not enable_oot:
-                result = conduct_turn()
-            elif oot:
+            if oot:
                 result = conduct_turn(oot_turn=True)
             else:
                 result = conduct_turn()
@@ -230,4 +226,4 @@ def play_game(nplayers=4,agents=[],nturns=0,is_verbose=True,with_oot=True):
     else: print('Invalid turn argument')
 
 if __name__ == '__main__':
-    play_game(8)
+    play_game()
